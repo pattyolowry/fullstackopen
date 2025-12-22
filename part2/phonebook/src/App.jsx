@@ -22,7 +22,6 @@ const App = () => {
     event.preventDefault()
     console.log('button clicked', event.target)
     const person = persons.find(p => p.name === newName)
-    const nameExists = persons.some(person => person.name === newName)
     const phoneExists = persons.some(person => person.number === newPhone)
 
     if (person) {
