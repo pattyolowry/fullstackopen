@@ -21,32 +21,42 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     console.log('button clicked', event.target)
+    const person = persons.find(p => p.name === newName)
     const nameExists = persons.some(person => person.name === newName)
-    const phoneExists = persons.some(person => person.phone === newPhone)
+    const phoneExists = persons.some(person => person.number === newPhone)
 
-    if (nameExists) {
-      return (
-        alert(`${newName} is already added to phonebook`)
-      )
+    if (person) {
+      if (window.confirm(`${person.name} is already added to phonebook. Replace the old number with a new one?`)) {
+        console.log(`Update number for ${person.name} to ${newPhone}`)
+        const changedPerson = {...person, number: newPhone}
+        console.log(changedPerson)
+        personService
+          .update(person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id === person.id ? returnedPerson : p))
+            setNewName('')
+            setNewPhone('')
+          })
+      }
     } else if (newPhone && phoneExists) {
       return (
         alert(`${newPhone} is already added to phonebook`)
       )
-    }
+    } else {
+      const personObject = {
+        name: newName,
+        number: newPhone,
+      }
 
-    const personObject = {
-      name: newName,
-      phone: newPhone,
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          console.log(returnedPerson)
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewPhone('')
+        })
     }
-
-    personService
-      .create(personObject)
-      .then(returnedPerson => {
-        console.log(returnedPerson)
-        setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewPhone('')
-      })
   }
 
   const handleNameChange = (event) => {
