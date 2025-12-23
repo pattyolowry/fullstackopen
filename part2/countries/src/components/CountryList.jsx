@@ -1,8 +1,8 @@
-const Country = ({name, country}) => {
+const Country = ({name, country, buttonHandler}) => {
     if (!country) {
         return (
             <div>
-                {name}
+                {name} <button onClick={() => {buttonHandler(name)}}>Show</button>
             </div>
         )
     }
@@ -21,7 +21,7 @@ const Country = ({name, country}) => {
     )
 }
 
-const CountryList = ({countries}) => {
+const CountryList = ({countries, buttonHandler}) => {
     if (countries.length > 10) {
         return (
             <div>
@@ -35,6 +35,7 @@ const CountryList = ({countries}) => {
                     key={country.name.common}
                     name={country.name.common}
                     country={null}
+                    buttonHandler={buttonHandler}
                 />)
         )
     } else if (countries.length === 1) {

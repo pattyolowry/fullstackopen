@@ -14,23 +14,34 @@ const App =() => {
       .getAll()
       .then(response => {
         setCountries(response)
+        console.log('countries fetched')
       })
   }, [])
 
   const handleCountry = (event) => {
-    const newCountry = event.target.value
+    const newCountry = event.target.value.toLowerCase()
+    setCountry(newCountry)
     console.log(`country is '${newCountry}'`)
-    setCountry(event.target.value.toLowerCase())
+    const countriesToShow = newCountry
+      ? countries.filter(c => c.name.common.toLowerCase().includes(newCountry))
+      : []
+    setResults(countriesToShow)
   }
 
-  const countriesToShow = country
-    ? countries.filter(c => c.name.common.toLowerCase().includes(country))
-    : []
+  const handleShow = (countryName) => {
+    console.log('button clicked')
+    console.log(countryName)
+    const countriesToShow = countryName
+      ? countries.filter(c => c.name.common === countryName)
+      : []
+    console.log(countriesToShow)
+    setResults(countriesToShow)
+  }
 
   return (
     <div>
       <CountryInput value={country} handler={handleCountry} />
-      <CountryList countries={countriesToShow} />
+      <CountryList countries={results} buttonHandler={handleShow} />
     </div>
   )
 }
