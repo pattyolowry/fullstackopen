@@ -10,8 +10,8 @@ const Country = ({name, country, buttonHandler}) => {
     return (
         <div>
             <h1>{name}</h1>
-            Capital {country.capital}<br/>
-            Area {country.area}
+            Capital: {country.capital}<br/>
+            Area: {country.area}
             <h2>Languages</h2>
             <ul>
                 {languages.map(l => <li key={l}>{l}</li>)}
