@@ -7,6 +7,7 @@ const App =() => {
   const [country, setCountry] = useState('')
   const [countries, setCountries] = useState([])
   const [results, setResults] = useState([])
+  const [weather, setWeather] = useState(null)
 
   useEffect(() => {
     console.log('effect run, fetching countries')
@@ -17,6 +18,12 @@ const App =() => {
         console.log('countries fetched')
       })
   }, [])
+
+  useEffect(() => {
+    if (results.length === 1) {
+      console.log('country selected, fetch weather')
+    }
+  }, [results])
 
   const handleCountry = (event) => {
     const newCountry = event.target.value.toLowerCase()
