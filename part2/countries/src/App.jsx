@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import CountryInput from './components/CountryInput'
 import CountryList from './components/CountryList'
 import countryService from './services/country'
+import weatherService from './services/weather'
 
 const App =() => {
   const [country, setCountry] = useState('')
@@ -22,6 +23,11 @@ const App =() => {
   useEffect(() => {
     if (results.length === 1) {
       console.log('country selected, fetch weather')
+      weatherService
+        .getWeather("60.17", "24.93")
+        .then(response => {
+          console.log(response)
+        })
     }
   }, [results])
 
