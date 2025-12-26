@@ -422,3 +422,5 @@ FodyWeavers.xsd
 
 # Env
 *.env
+
+*node_modules
