@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 
+app.use(cors())
 app.use(express.json())
 
 morgan.token("request-body", (req) => JSON.stringify(req.body))
@@ -98,6 +100,31 @@ app.post('/api/persons', (request, response) => {
   }
 
   persons = persons.concat(person)
+
+  response.json(person)
+})
+
+app.put('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const body = request.body
+
+  if (!body.name) {
+    return response.status(400).json({ 
+      error: 'name missing' 
+    })
+  } else if (!body.number) {
+    return response.status(400).json({ 
+      error: 'number missing' 
+    })
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number || null,
+    id: id,
+  }
+
+  persons = persons.map(p => p.id === id ? person : p)
 
   response.json(person)
 })
