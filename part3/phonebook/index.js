@@ -66,22 +66,21 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const existing = persons.find(person => person.name === body.name)
-  if (existing) {
-    return response.status(400).json({ 
-      error: 'name already exists in phonebook' 
-    })
-  }
+//   const existing = persons.find(person => person.name === body.name)
+//   if (existing) {
+//     return response.status(400).json({ 
+//       error: 'name already exists in phonebook' 
+//     })
+//   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number || null,
-    id: generateId(),
-  }
+  })
 
-  persons = persons.concat(person)
-
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 app.put('/api/persons/:id', (request, response) => {
