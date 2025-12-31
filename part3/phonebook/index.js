@@ -19,7 +19,7 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-const infoHtml = () => {
+const infoHtml = (persons) => {
     const now = new Date()
     let html = `<div>Phonebook has info for ${persons.length} people</div>`
     html += `<p>${now}</p>`
@@ -27,8 +27,9 @@ const infoHtml = () => {
 }
 
 app.get('/info', (request, response) => {
-    const now = new Date()
-    response.send(infoHtml())
+    Person.find({}).then(persons => {
+        response.send(infoHtml(persons))
+    })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
