@@ -31,7 +31,7 @@ app.get('/info', (request, response) => {
     response.send(infoHtml())
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             if (person) {
@@ -40,10 +40,7 @@ app.get('/api/persons/:id', (request, response) => {
                 response.status(404).end()
             }
         })
-        .catch(error => {
-            console.log(error)
-            response.status(400).send({error: 'malformed id'})
-        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -51,15 +48,8 @@ app.delete('/api/persons/:id', (request, response) => {
         .then(result => {
             response.status(204).end()
         })
-        .catch(error => {
-            console.log(error)
-            response.status(400).send()
-        })
+        .catch(error => next(error))
 })
-
-const generateId = () => {
-  return String(Math.floor(Math.random() * 1000))
-}
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
@@ -73,13 +63,6 @@ app.post('/api/persons', (request, response) => {
       error: 'number missing' 
     })
   }
-
-//   const existing = persons.find(person => person.name === body.name)
-//   if (existing) {
-//     return response.status(400).json({ 
-//       error: 'name already exists in phonebook' 
-//     })
-//   }
 
   const person = new Person({
     name: body.name,
@@ -115,6 +98,18 @@ app.put('/api/persons/:id', (request, response) => {
 
   response.json(person)
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: 'malformed id'})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
