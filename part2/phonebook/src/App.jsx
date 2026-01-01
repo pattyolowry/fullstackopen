@@ -45,11 +45,16 @@ const App = () => {
             }, 5000)
           })
           .catch(error => {
-            setErrorMessage(`${person.name} has already been removed from server`)
+            console.log(error)
+            if (error.status === 404) {
+              setErrorMessage(`${person.name} has already been removed from server`)
+              setPersons(persons.filter(p => p.name !== person.name))
+            } else {
+              setErrorMessage(`${error.response.data.error}`)
+            }
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
-            setPersons(persons.filter(p => p.name !== person.name))
           })
       }
     } else if (newPhone && phoneExists) {
@@ -110,6 +115,13 @@ const App = () => {
         .deleteOne(person.id)
         .then(deletedPerson => {
           setPersons(persons.filter(p => p.id !== person.id))
+        })
+        .catch(error => {
+          console.log(error)
+          setErrorMessage(`${error.response.data.error}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
         })
     } else {
       console.log('cancelled delete')
