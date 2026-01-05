@@ -53,7 +53,7 @@ test('blog identifier is id not _id', async () => {
   assert(!keys.includes('_id'))
 })
 
-test.only('a valid blog can be added', async () => {
+test('a valid blog can be added', async () => {
   const newBlog = {
     title: 'First class tests',
     author: 'Robert C. Martin',
