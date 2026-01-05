@@ -86,9 +86,41 @@ test('blogs default to 0 likes', async () => {
     .post('/api/blogs')
     .send(newBlog)
 
-  //const response = await api.get('/api/blogs')
+  assert.deepStrictEqual(response.body.likes, 0)
+})
 
-  assert.strictEqual(response.body.likes, 0)
+test('creating blog without title returns 400 error', async () => {
+  const newBlog = {
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    likes: 10,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const response = await api.get('/api/blogs')
+
+  assert.strictEqual(response.body.length, initialBlogs.length)
+})
+
+test('creating blog without url returns 400 error', async () => {
+  const newBlog = {
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    likes: 10,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const response = await api.get('/api/blogs')
+
+  assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
 after(async () => {
