@@ -146,6 +146,52 @@ test('delete with invalid id returns 400', async () => {
     .expect(400)
 })
 
+test('a blog can be updated', async () => {
+  const blogs = await api.get('/api/blogs')
+  const blogToUpdate = blogs.body[0]
+  const updatedBlog = {
+    ...blogToUpdate,
+    title: 'Updated Blog Title',
+    likes: 4298,
+  }
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+
+  assert.deepStrictEqual(response.body.title, 'Updated Blog Title')
+  assert.deepStrictEqual(response.body.likes, 4298)
+  assert.deepStrictEqual(response.body.id, blogToUpdate.id)
+})
+
+test('updating a blog with invalid id returns 400', async () => {
+  const invalidId = '1234'
+
+  await api
+    .put(`/api/blogs/${invalidId}`)
+    .expect(400)
+})
+
+test('updating a non-existing blog returns 404', async () => {
+  const blogInfo = {
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    likes: 10,
+  }
+  const blogToBeDeleted = await api
+    .post('/api/blogs')
+    .send(blogInfo)
+
+  const deletedId = blogToBeDeleted.body.id
+
+  await api.delete(`/api/blogs/${deletedId}`)
+
+  await api
+    .put(`/api/blogs/${deletedId}`)
+    .send(blogInfo)
+    .expect(404)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
