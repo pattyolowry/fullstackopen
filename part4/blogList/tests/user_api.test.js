@@ -56,6 +56,65 @@ test('user creation fails if username already taken', async () => {
   assert.strictEqual(usersAtEnd.body.length, usersAtStart.body.length)
 })
 
+test('user creation fails if username is invalid', async () => {
+  const usersAtStart = await api.get('/api/users')
+
+  const newUser = {
+    username: 'tu',
+    name: 'Test User',
+    password: 'foobar'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(400)
+
+  assert(response.body.error.includes('User validation failed'))
+
+  const usersAtEnd = await api.get('/api/users')
+  assert.strictEqual(usersAtEnd.body.length, usersAtStart.body.length)
+})
+
+test('user creation fails if password is missing', async () => {
+  const usersAtStart = await api.get('/api/users')
+
+  const newUser = {
+    username: 'testuser',
+    name: 'Test User'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(400)
+
+  assert(response.body.error.includes('password is missing or invalid'))
+
+  const usersAtEnd = await api.get('/api/users')
+  assert.strictEqual(usersAtEnd.body.length, usersAtStart.body.length)
+})
+
+test('user creation fails if password is invalid', async () => {
+  const usersAtStart = await api.get('/api/users')
+
+  const newUser = {
+    username: 'testuser',
+    name: 'Test User',
+    password: 'no'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(400)
+
+  assert(response.body.error.includes('password is missing or invalid'))
+
+  const usersAtEnd = await api.get('/api/users')
+  assert.strictEqual(usersAtEnd.body.length, usersAtStart.body.length)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
