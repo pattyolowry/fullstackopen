@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -28,9 +30,22 @@ const initialBlogs = [
   }
 ]
 
+let authToken = null
+
 beforeEach(async () => {
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'testuser', passwordHash })
+  await user.save()
+  const loginResponse = await api.post('/api/login').send({
+    username: 'testuser',
+    password: 'sekret'
+  })
+  authToken = `Bearer ${loginResponse.body.token}`
   await Blog.deleteMany({})
-  await Blog.insertMany(initialBlogs)
+  await Promise.all(initialBlogs.map(async (b) => {
+    return api.post('/api/blogs').send(b).set({ Authorization: authToken })
+  }))
 })
 
 test('blogs are returned as json', async () => {
@@ -64,6 +79,7 @@ test('a valid blog can be added', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization: authToken })
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -85,8 +101,27 @@ test('blogs default to 0 likes', async () => {
   const response = await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization: authToken })
 
   assert.deepStrictEqual(response.body.likes, 0)
+})
+
+test('creating blog without token returns 401', async () => {
+  const newBlog = {
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    likes: 10,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+
+  const response = await api.get('/api/blogs')
+
+  assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
 test('creating blog without title returns 400 error', async () => {
@@ -99,6 +134,7 @@ test('creating blog without title returns 400 error', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization: authToken })
     .expect(400)
 
   const response = await api.get('/api/blogs')
@@ -116,6 +152,7 @@ test('creating blog without url returns 400 error', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization: authToken })
     .expect(400)
 
   const response = await api.get('/api/blogs')
@@ -129,6 +166,7 @@ test('a blog can be deleted', async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set({ Authorization: authToken })
     .expect(204)
 
   const blogsAtEnd = await api.get('/api/blogs')
@@ -143,6 +181,7 @@ test('delete with invalid id returns 400', async () => {
 
   await api
     .delete(`/api/blogs/${invalidId}`)
+    .set({ Authorization: authToken })
     .expect(400)
 })
 
@@ -181,10 +220,11 @@ test('updating a non-existing blog returns 404', async () => {
   const blogToBeDeleted = await api
     .post('/api/blogs')
     .send(blogInfo)
+    .set({ Authorization: authToken })
 
   const deletedId = blogToBeDeleted.body.id
 
-  await api.delete(`/api/blogs/${deletedId}`)
+  await api.delete(`/api/blogs/${deletedId}`).set({ Authorization: authToken })
 
   await api
     .put(`/api/blogs/${deletedId}`)
