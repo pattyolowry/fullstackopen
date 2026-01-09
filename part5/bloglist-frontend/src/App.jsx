@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+import Error from './components/Error'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -13,7 +15,9 @@ const App = () => {
   const [blogTitle, setBlogTitle] = useState('')
   const [blogAuthor, setBlogAuthor] = useState('')
   const [blogUrl, setBlogUrl] = useState('')
-
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
+ 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
@@ -41,8 +45,12 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch {
+    } catch (error) {
       console.log('wrong credentials')
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 
@@ -68,6 +76,10 @@ const App = () => {
     }
     try {
       const returnedBlog = await blogService.create(newBlog)
+      setNotificationMessage(`New blog added: ${returnedBlog.title} by ${returnedBlog.author}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
       setBlogs(blogs.concat(returnedBlog))
       //console.log(returnedBlog)
       setBlogTitle('')
@@ -75,11 +87,17 @@ const App = () => {
       setBlogUrl('')
     } catch (error) {
       console.error(`Failed to create blog: ${error.response.data.error}`)
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 
   return (
     <div>
+      <Notification message={notificationMessage}/>
+      <Error message={errorMessage}/>
       {!user && (
         <LoginForm
           username={username}
