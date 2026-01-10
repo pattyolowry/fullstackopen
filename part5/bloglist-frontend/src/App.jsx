@@ -13,9 +13,6 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const [blogTitle, setBlogTitle] = useState('')
-  const [blogAuthor, setBlogAuthor] = useState('')
-  const [blogUrl, setBlogUrl] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
  
@@ -62,23 +59,15 @@ const App = () => {
     setUser(null)
     setUsername('')
     setPassword('')
-    setBlogTitle('')
-    setBlogAuthor('')
-    setBlogUrl('')
   }
 
   const blogFormRef = useRef()
 
-  const handleNewBlog = async event => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
     console.log(`creating blog`)
-    const newBlog = {
-      title: blogTitle,
-      author: blogAuthor,
-      url: blogUrl
-    }
+
     try {
-      const returnedBlog = await blogService.create(newBlog)
+      const returnedBlog = await blogService.create(blogObject)
       setNotificationMessage(`New blog added: ${returnedBlog.title} by ${returnedBlog.author}`)
       setTimeout(() => {
         setNotificationMessage(null)
@@ -86,9 +75,6 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
       blogFormRef.current.toggleVisibility()
       //console.log(returnedBlog)
-      setBlogTitle('')
-      setBlogAuthor('')
-      setBlogUrl('')
     } catch (error) {
       console.error(`Failed to create blog: ${error.response.data.error}`)
       setErrorMessage(error.response.data.error)
@@ -117,13 +103,7 @@ const App = () => {
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           <Togglable buttonLabel='Create New Blog' ref={blogFormRef}>
             <BlogForm
-              blogTitle={blogTitle}
-              blogAuthor={blogAuthor}
-              blogUrl={blogUrl}
-              handleNewBlog={handleNewBlog}
-              setBlogTitle={setBlogTitle}
-              setBlogAuthor={setBlogAuthor}
-              setBlogUrl={setBlogUrl}
+              addBlog={addBlog}
             />
           </Togglable>
           {blogs.map(blog =>
