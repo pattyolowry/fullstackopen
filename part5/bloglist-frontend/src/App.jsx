@@ -15,10 +15,19 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
+
+  const compareLikes = (a, b) => {
+    return b.likes - a.likes
+  }
+
+  const addLike = (blogId) => {
+    const updatedBlogs = blogs.map(b => b.id !== blogId ? b : { ...b, likes: b.likes + 1 })
+    setBlogs(updatedBlogs.sort(compareLikes))
+  }
  
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort(compareLikes) )
     )  
   }, [])
 
@@ -72,7 +81,7 @@ const App = () => {
       setTimeout(() => {
         setNotificationMessage(null)
       }, 5000)
-      setBlogs(blogs.concat(returnedBlog))
+      setBlogs(blogs.concat(returnedBlog).sort(compareLikes))
       blogFormRef.current.toggleVisibility()
       //console.log(returnedBlog)
     } catch (error) {
@@ -107,7 +116,7 @@ const App = () => {
             />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} addLike={addLike}/>
           )}
         </div>
       )}
