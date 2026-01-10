@@ -10,8 +10,8 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
@@ -24,11 +24,11 @@ const App = () => {
     const updatedBlogs = blogs.map(b => b.id !== blogId ? b : { ...b, likes: b.likes + 1 })
     setBlogs(updatedBlogs.sort(compareLikes))
   }
- 
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs.sort(compareLikes) )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const App = () => {
   const blogFormRef = useRef()
 
   const addBlog = async (blogObject) => {
-    console.log(`creating blog`)
+    console.log('creating blog')
 
     try {
       const returnedBlog = await blogService.create(blogObject)

@@ -35,10 +35,10 @@ const Blog = ({ blog, addLike, removeBlog }) => {
 
   const handleRemove = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      console.log("remove blog")
+      console.log('remove blog')
       removeBlog(blog)
     } else {
-      console.log("cancel remove")
+      console.log('cancel remove')
     }
   }
 
@@ -53,7 +53,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
           <button onClick={handleRemove}>Remove</button>
         )}
       </div>
-    </div>  
+    </div>
   )
 }
 
