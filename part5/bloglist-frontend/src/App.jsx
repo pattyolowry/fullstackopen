@@ -93,6 +93,25 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (blogObject) => {
+    console.log(`removing blog ${blogObject.title} by ${blogObject.author}`)
+
+    try {
+      await blogService.remove(blogObject.id)
+      setNotificationMessage(`Blog removed: ${blogObject.title} by ${blogObject.author}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+      setBlogs(blogs.filter(b => b.id !== blogObject.id).sort(compareLikes))
+    } catch (error) {
+      console.error(`Failed to remove blog: ${error.response.data.error}`)
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
   return (
     <div>
       <Notification message={notificationMessage}/>
@@ -116,7 +135,7 @@ const App = () => {
             />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} addLike={addLike}/>
+            <Blog key={blog.id} blog={blog} addLike={addLike} removeBlog={removeBlog}/>
           )}
         </div>
       )}
