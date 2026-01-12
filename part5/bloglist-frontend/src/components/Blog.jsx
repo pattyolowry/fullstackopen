@@ -43,13 +43,13 @@ const Blog = ({ blog, addLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div className='blog' style={blogStyle}>
       {blog.title} by {blog.author} <button onClick={toggleDetails}>{buttonText()}</button>
       <div style={showWhenVisible}>
         {blog.url}<br/>
         Likes {likes} <button onClick={handleLike}>Like</button><br/>
         Added by {blog.user.name}<br/>
-        {loggedUser.username === blog.user.username && (
+        {loggedUser && loggedUser.username === blog.user.username && (
           <button onClick={handleRemove}>Remove</button>
         )}
       </div>
