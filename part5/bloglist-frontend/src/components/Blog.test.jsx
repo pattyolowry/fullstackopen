@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
+vi.mock('../services/blogs')
+
 test('renders content', () => {
   const blog = {
     title: 'This is a Test Blog',
@@ -61,4 +63,29 @@ test('clicking the view button shows url and likes', async () => {
 
   likes = screen.getByText('Likes 42', { exact: false })
   expect(likes).toBeVisible()
+})
+
+test('clicking the Like button twice calles the handler twice', async () => {
+  const blog = {
+    title: 'This is a Test Blog',
+    author: 'John Doe',
+    url: 'https://testblog.com/johndoe',
+    likes: 42,
+    user: {
+      username: 'pedrop',
+      name: 'Pedro Pascal'
+    }
+  }
+
+  const addLike = vi.fn()
+  const removeBlog = vi.fn()
+
+  render(<Blog blog={blog} addLike={addLike} removeBlog={removeBlog} />)
+
+  const user = userEvent.setup()
+  const likeButton = screen.getByText('Like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(addLike.mock.calls).toHaveLength(2)
 })
