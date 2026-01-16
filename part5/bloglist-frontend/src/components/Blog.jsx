@@ -47,7 +47,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
       {blog.title} by {blog.author} <button onClick={toggleDetails}>{buttonText()}</button>
       <div style={showWhenVisible}>
         {blog.url}<br/>
-        Likes {likes} <button onClick={handleLike}>Like</button><br/>
+        Likes <span data-testid='likes-count'>{likes}</span> <button onClick={handleLike}>Like</button><br/>
         Added by {blog.user.name}<br/>
         {loggedUser && loggedUser.username === blog.user.username && (
           <button onClick={handleRemove}>Remove</button>

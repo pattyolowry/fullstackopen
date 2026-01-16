@@ -43,5 +43,23 @@ describe('Blog app', () => {
         await createBlog(page, 'Testing Blog', 'John Doe', 'http://testingblog.com')
         await expect(page.locator('.blog').filter({ hasText: 'Testing Blog' })).toBeVisible()
     })
+
+    describe('and several blogs exist', () => {
+        beforeEach(async ({ page }) => {
+            await createBlog(page, 'Testing Blog', 'John Doe', 'http://testingblog.com')
+            await createBlog(page, 'Groundbreaking Observation', 'Jane Doe', 'http://gbo.com')
+        })
+
+        test('a blog can be liked', async ({ page }) => {
+            const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' });
+            await blog.getByRole('button', { name: 'View' }).click()
+            await page.pause()
+            const likesBefore = await blog.getByTestId('likes-count').textContent()
+            await blog.getByRole('button', { name: 'Like' }).click()
+            await blog.getByText(`Likes ${Number(likesBefore) + 1}`).waitFor()
+            const likesAfter = await blog.getByTestId('likes-count').textContent()
+            expect(Number(likesAfter)).toBe(Number(likesBefore) + 1)
+        })
+    })
     })
 })
