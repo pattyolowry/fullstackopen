@@ -61,7 +61,6 @@ describe('Blog app', () => {
         })
 
         test('a blog can be deleted', async ({ page }) => {
-            await page.pause()
             const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' })
             await blog.getByRole('button', { name: 'View' }).click()
             page.once('dialog', async (dialog) => {
@@ -70,6 +69,22 @@ describe('Blog app', () => {
             })
             await blog.getByRole('button', { name: 'Remove' }).click()
             await blog.waitFor({ state: 'detached' })
+        })
+
+        test('a blog cannot be deleted by a different user', async ({ page, request }) => {
+            await request.post('http://localhost:3003/api/users', {
+                data: {
+                    name: 'New User',
+                    username: 'nuser',
+                    password: 'openup'
+                }
+            })
+            await page.getByRole('button', { name: 'logout' }).click()
+            await loginWith(page, 'nuser', 'openup')
+
+            const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' })
+            await blog.getByRole('button', { name: 'View' }).click()
+            await expect(blog.getByRole('button', { name: 'Remove' })).not.toBeVisible()
         })
     })
     })
