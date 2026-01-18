@@ -51,14 +51,25 @@ describe('Blog app', () => {
         })
 
         test('a blog can be liked', async ({ page }) => {
-            const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' });
+            const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' })
             await blog.getByRole('button', { name: 'View' }).click()
-            await page.pause()
             const likesBefore = await blog.getByTestId('likes-count').textContent()
             await blog.getByRole('button', { name: 'Like' }).click()
             await blog.getByText(`Likes ${Number(likesBefore) + 1}`).waitFor()
             const likesAfter = await blog.getByTestId('likes-count').textContent()
             expect(Number(likesAfter)).toBe(Number(likesBefore) + 1)
+        })
+
+        test('a blog can be deleted', async ({ page }) => {
+            await page.pause()
+            const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' })
+            await blog.getByRole('button', { name: 'View' }).click()
+            page.once('dialog', async (dialog) => {
+                expect(dialog.type()).toBe('confirm')
+                await dialog.accept()
+            })
+            await blog.getByRole('button', { name: 'Remove' }).click()
+            await blog.waitFor({ state: 'detached' })
         })
     })
     })
