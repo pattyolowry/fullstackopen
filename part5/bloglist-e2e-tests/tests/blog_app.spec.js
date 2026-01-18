@@ -48,6 +48,7 @@ describe('Blog app', () => {
         beforeEach(async ({ page }) => {
             await createBlog(page, 'Testing Blog', 'John Doe', 'http://testingblog.com')
             await createBlog(page, 'Groundbreaking Observation', 'Jane Doe', 'http://gbo.com')
+            await createBlog(page, 'Another One', 'DJ Khaled', 'http://another1.com')
         })
 
         test('a blog can be liked', async ({ page }) => {
@@ -85,6 +86,35 @@ describe('Blog app', () => {
             const blog = page.locator('.blog').filter({ hasText: 'Testing Blog' })
             await blog.getByRole('button', { name: 'View' }).click()
             await expect(blog.getByRole('button', { name: 'Remove' })).not.toBeVisible()
+        })
+
+        test('blogs are sorted by likes', async ({ page }) => {
+            await page.pause()
+            const blogs = page.locator('.blog')
+            const count = await blogs.count()
+
+            // add increasing likes
+            for (let i = 0; i < count; i++) {
+                let blog = blogs.nth(i)
+                const blogTitle = await blog.getByTestId('blog-title').textContent()
+                blog = page.locator('.blog').filter({ hasText: blogTitle })
+                await blog.getByRole('button', { name: 'View' }).click()
+
+                for (let j = 0; j <= i; j++) {
+                    const likeButton = blog.getByRole('button', { name: 'Like' })
+                    const likeCount = blog.getByTestId('likes-count')
+                    let currentLikes = Number(await likeCount.textContent())
+                    await likeButton.click()
+                    currentLikes += 1
+                    await expect(likeCount).toHaveText(String(currentLikes))
+                }
+            }
+
+            const likes = await page.locator('.blog [data-testid="likes-count"]').allTextContents()
+
+            const likeNumbers = likes.map(l => Number(l))
+            const sortedLikes = likeNumbers.toSorted((a, b) => b - a)
+            expect(likeNumbers).toEqual(sortedLikes)
         })
     })
     })

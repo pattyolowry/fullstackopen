@@ -44,7 +44,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
 
   return (
     <div className='blog' style={blogStyle}>
-      {blog.title} by {blog.author} <button onClick={toggleDetails}>{buttonText()}</button>
+      <span data-testid='blog-title'>{blog.title} by {blog.author}</span> <button onClick={toggleDetails}>{buttonText()}</button>
       <div style={showWhenVisible}>
         {blog.url}<br/>
         Likes <span data-testid='likes-count'>{likes}</span> <button onClick={handleLike}>Like</button><br/>
