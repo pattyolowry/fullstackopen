@@ -70,9 +70,9 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const content = useField('')
-  const author = useField('')
-  const info = useField('')
+  const {reset: resetContent, ...content} = useField('')
+  const {reset: resetAuthor, ...author} = useField('')
+  const {reset: resetInfo, ...info} = useField('')
 
 
   const handleSubmit = (e) => {
@@ -85,10 +85,16 @@ const CreateNew = (props) => {
     })
   }
 
+  const handleReset = () => {
+    resetContent()
+    resetAuthor()
+    resetInfo()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
         <div>
           content
           <input {...content} />
@@ -102,6 +108,7 @@ const CreateNew = (props) => {
           <input {...info} />
         </div>
         <button>create</button>
+        <button type='reset'>reset</button>
       </form>
     </div>
   )
