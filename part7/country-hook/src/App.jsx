@@ -15,10 +15,38 @@ const useField = (type) => {
   }
 }
 
+const baseUrl = 'https://studies.cs.helsinki.fi/restcountries/api'
+
+const getCountry = (name) => {
+    const request = axios.get(`${baseUrl}/name/${name}`)
+    return request.then(response => response.data)
+}
+
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  useEffect(() => {
+    if (name !== '') {
+      getCountry(name)
+        .then(response => {
+          setCountry({
+            found: true,
+            data: {
+              name: response.name.common,
+              capital: response.capital[0],
+              population: response.population,
+              flag: response.flags.png
+            }
+          })
+        })
+        .catch(error => {
+          console.log(error)
+          setCountry({found: false, data: null})
+        })
+    } else {
+      setCountry(null)
+    }
+  }, [name])
 
   return country
 }
