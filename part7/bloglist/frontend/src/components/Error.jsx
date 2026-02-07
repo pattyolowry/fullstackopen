@@ -1,7 +1,6 @@
-const Error = ({ message }) => {
-  if (message === null) {
-    return null;
-  }
+import { useSelector } from "react-redux";
+
+const Error = () => {
 
   const errorStyle = {
     color: "red",
@@ -13,7 +12,12 @@ const Error = ({ message }) => {
     marginBottom: 10,
   };
 
-  return <div style={errorStyle}>{message}</div>;
+  const error = useSelector((state) => state.error);
+  if (error === null) {
+    return null;
+  }
+
+  return <div style={errorStyle}>{error}</div>;
 };
 
 export default Error;

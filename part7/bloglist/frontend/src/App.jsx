@@ -7,14 +7,26 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import { useDispatch } from "react-redux";
+import { setNotification } from "./reducers/notificationReducer";
+import { setError } from "./reducers/errorReducer";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [notificationMessage, setNotificationMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
+  const dispatch = useDispatch();
 
   const compareLikes = (a, b) => {
     return b.likes - a.likes;
@@ -31,15 +43,6 @@ const App = () => {
     blogService.getAll().then((blogs) => setBlogs(blogs.sort(compareLikes)));
   }, []);
 
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
-    }
-  }, []);
-
   const handleLogin = async (event) => {
     event.preventDefault();
     console.log("logging in with", username, password);
@@ -52,10 +55,7 @@ const App = () => {
       setPassword("");
     } catch (error) {
       console.log("wrong credentials");
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setError(error.response.data.error));
     }
   };
 
@@ -75,21 +75,17 @@ const App = () => {
 
     try {
       const returnedBlog = await blogService.create(blogObject);
-      setNotificationMessage(
-        `New blog added: ${returnedBlog.title} by ${returnedBlog.author}`,
+      dispatch(
+        setNotification(
+          `New blog added: ${returnedBlog.title} by ${returnedBlog.author}`,
+          5,
+        ),
       );
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
       setBlogs(blogs.concat(returnedBlog).sort(compareLikes));
       blogFormRef.current.toggleVisibility();
-      //console.log(returnedBlog)
     } catch (error) {
       console.error(`Failed to create blog: ${error.response.data.error}`);
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setError(error.response.data.error));
     }
   };
 
@@ -98,26 +94,23 @@ const App = () => {
 
     try {
       await blogService.remove(blogObject.id);
-      setNotificationMessage(
-        `Blog removed: ${blogObject.title} by ${blogObject.author}`,
+      dispatch(
+        setNotification(
+          `Blog removed: ${blogObject.title} by ${blogObject.author}`,
+          5,
+        ),
       );
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
       setBlogs(blogs.filter((b) => b.id !== blogObject.id).sort(compareLikes));
     } catch (error) {
       console.error(`Failed to remove blog: ${error.response.data.error}`);
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(setError(error.response.data.error));
     }
   };
 
   return (
     <div>
-      <Notification message={notificationMessage} />
-      <Error message={errorMessage} />
+      <Notification />
+      <Error />
       {!user && (
         <LoginForm
           username={username}
