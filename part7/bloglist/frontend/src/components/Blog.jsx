@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { useDispatch } from 'react-redux'
+import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { setNotification } from "../reducers/notificationReducer";
+import { setError } from "../reducers/errorReducer";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog }) => {
   const [visible, setVisible] = useState(false);
   const showWhenVisible = { display: visible ? "" : "none" };
   const [likes, setLikes] = useState(blog.likes);
+  const dispatch = useDispatch()
 
   const toggleDetails = () => {
     setVisible(!visible);
@@ -20,7 +25,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
       likes: likes + 1,
     });
     setLikes(likes + 1);
-    addLike(blog.id);
+    dispatch(likeBlog(blog));
   };
 
   const blogStyle = {
@@ -37,8 +42,22 @@ const Blog = ({ blog, addLike, removeBlog }) => {
 
   const handleRemove = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      console.log("remove blog");
-      removeBlog(blog);
+      console.log(`removing blog ${blog.title} by ${blog.author}`);
+
+      try {
+        await blogService.remove(blog.id);
+        dispatch(
+          setNotification(
+            `Blog removed: ${blog.title} by ${blog.author}`,
+            5,
+          ),
+        );
+        dispatch(removeBlog(blog));
+      } catch (error) {
+        console.error(error)
+        // console.error(`Failed to remove blog: ${error.response.data.error}`);
+        dispatch(setError(error.response.data.error));
+      }
     } else {
       console.log("cancel remove");
     }
