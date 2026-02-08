@@ -1,30 +1,21 @@
-import { useState } from "react";
 import { useDispatch } from 'react-redux'
-import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { likeBlog, removeBlog, toggleVisibility } from '../reducers/blogReducer'
 import { setNotification } from "../reducers/notificationReducer";
 import { setError } from "../reducers/errorReducer";
-import blogService from "../services/blogs";
 
 const Blog = ({ blog }) => {
-  const [visible, setVisible] = useState(false);
-  const showWhenVisible = { display: visible ? "" : "none" };
-  const [likes, setLikes] = useState(blog.likes);
+  const showWhenVisible = { display: blog.visible ? "" : "none" };
   const dispatch = useDispatch()
 
   const toggleDetails = () => {
-    setVisible(!visible);
+    dispatch(toggleVisibility(blog.id));
   };
 
   const buttonText = () => {
-    return visible ? "Hide" : "View";
+    return blog.visible ? "Hide" : "View";
   };
 
-  const handleLike = async () => {
-    await blogService.update({
-      ...blog,
-      likes: likes + 1,
-    });
-    setLikes(likes + 1);
+  const handleLike = () => {
     dispatch(likeBlog(blog));
   };
 
@@ -40,22 +31,20 @@ const Blog = ({ blog }) => {
     window.localStorage.getItem("loggedBlogappUser"),
   );
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       console.log(`removing blog ${blog.title} by ${blog.author}`);
 
       try {
-        await blogService.remove(blog.id);
+        dispatch(removeBlog(blog));
         dispatch(
           setNotification(
             `Blog removed: ${blog.title} by ${blog.author}`,
             5,
           ),
         );
-        dispatch(removeBlog(blog));
       } catch (error) {
-        console.error(error)
-        // console.error(`Failed to remove blog: ${error.response.data.error}`);
+        console.error(`Failed to remove blog: ${error.response.data.error}`);
         dispatch(setError(error.response.data.error));
       }
     } else {
@@ -72,7 +61,7 @@ const Blog = ({ blog }) => {
       <div style={showWhenVisible}>
         {blog.url}
         <br />
-        Likes <span data-testid="likes-count">{likes}</span>{" "}
+        Likes <span data-testid="likes-count">{blog.likes}</span>{" "}
         <button onClick={handleLike}>Like</button>
         <br />
         Added by {blog.user.name}
