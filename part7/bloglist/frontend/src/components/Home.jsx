@@ -1,22 +1,15 @@
-import { useEffect} from "react";
 import LoginForm from "../components/LoginForm";
 import BlogForm from "../components/BlogForm";
 import BlogList from "../components/BlogList";
 import Error from "../components/Error";
 import Notification from "../components/Notification";
 import { useDispatch, useSelector } from "react-redux";
-import { initializeBlogs } from '../reducers/blogReducer'
-import { clearUser, initializeUser } from '../reducers/userReducer'
+import { clearUser } from '../reducers/userReducer'
 
 const Home = () => {
   const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(initializeUser())
-    dispatch(initializeBlogs())
-  }, [dispatch])
 
   const handleLogout = () => {
     console.log("logging out");

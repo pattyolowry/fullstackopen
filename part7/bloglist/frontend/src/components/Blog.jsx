@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { likeBlog, removeBlog, toggleVisibility } from '../reducers/blogReducer'
 import { setNotification } from "../reducers/notificationReducer";
 import { setError } from "../reducers/errorReducer";
@@ -27,9 +27,7 @@ const Blog = ({ blog }) => {
     marginBottom: 5,
   };
 
-  const loggedUser = JSON.parse(
-    window.localStorage.getItem("loggedBlogappUser"),
-  );
+  const loggedUser = useSelector((state) => state.user);
 
   const handleRemove = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {

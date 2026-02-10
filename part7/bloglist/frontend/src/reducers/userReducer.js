@@ -1,9 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
 
+const stored = window.localStorage.getItem("loggedBlogappUser");
+
+const initialUser = () => {
+  const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+  if (loggedUserJSON) {
+    const loggedUser = JSON.parse(loggedUserJSON);
+    blogService.setToken(loggedUser.token);
+    return loggedUser;
+  } else {
+    return null;
+  }
+};
+
 const userSlice = createSlice({
   name: "user",
-  initialState: null,
+  initialState: initialUser(),
   reducers: {
     set(state, action) {
       return action.payload;
@@ -26,19 +39,9 @@ export const setUser = (user) => {
 
 export const clearUser = (user) => {
   return (dispatch) => {
+    window.localStorage.removeItem("loggedBlogappUser");
     dispatch(clear(user));
     blogService.setToken(null);
-  };
-};
-
-export const initializeUser = () => {
-  console.log("initializing user");
-  return async (dispatch) => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
-    if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON);
-      dispatch(set(loggedUser));
-    }
   };
 };
 

@@ -42,7 +42,10 @@ blogsRouter.delete("/:id", userExtractor, async (request, response) => {
     return response.status(403).json({ error: "user not authorized" });
   }
 
-  user.blogs = user.blogs.filter((b) => b.id.toString() !== blog.id.toString());
+  user.blogs = user.blogs.filter(
+    (b) => b._id.toString() !== blog.id.toString(),
+  );
+  await user.save();
 
   await blog.deleteOne();
   response.status(204).end();

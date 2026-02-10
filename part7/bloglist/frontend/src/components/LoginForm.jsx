@@ -9,11 +9,11 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const user = useSelector((state) => state.user);
 
+  const dispatch = useDispatch();
+
   if (user) {
     return null
   }
-
-  const dispatch = useDispatch();
 
   const handleLogin = async (event) => {
     event.preventDefault();
