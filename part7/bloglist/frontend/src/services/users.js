@@ -6,4 +6,9 @@ const getAll = () => {
   return request.then((response) => response.data);
 };
 
-export default { getAll };
+const getOne = (id) => {
+  const request = axios.get(`${baseUrl}/${id}`);
+  return request.then((response) => response.data);
+};
+
+export default { getAll, getOne };
