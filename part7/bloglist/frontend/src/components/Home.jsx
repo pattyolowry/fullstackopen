@@ -3,18 +3,10 @@ import BlogForm from "../components/BlogForm";
 import BlogList from "../components/BlogList";
 import Error from "../components/Error";
 import Notification from "../components/Notification";
-import { useDispatch, useSelector } from "react-redux";
-import { clearUser } from '../reducers/userReducer'
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const user = useSelector((state) => state.user);
-
-  const dispatch = useDispatch();
-
-  const handleLogout = () => {
-    console.log("logging out");
-    dispatch(clearUser());
-  };
 
   return (
     <div>
@@ -24,9 +16,6 @@ const Home = () => {
       {user && (
         <div>
           <h2>Blogs</h2>
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </p>
           <BlogForm />
           <BlogList />
         </div>
