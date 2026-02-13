@@ -1,7 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { useState } from "react";
+import { setError } from "../reducers/errorReducer";
+import { setNotification } from "../reducers/notificationReducer";
+import { addComment } from '../reducers/blogReducer'
+import blogService from "../services/blogs";
 
 const Blog = ({ blog }) => {
+    const [comment, setComment] = useState("");
     const dispatch = useDispatch()
     const loggedUser = useSelector((state) => state.user);
 
@@ -34,6 +40,23 @@ const Blog = ({ blog }) => {
         }
     };
 
+    const handleNewComment = async (event) => {
+        event.preventDefault()
+        if (comment.length < 5) {
+            dispatch(setError("Comment too short", 5))
+            return
+        }
+
+        try {
+            await blogService.addComment(blog.id, comment);
+            dispatch(addComment(blog, comment))
+            dispatch(setNotification("Comment added", 5))
+            setComment("")
+        } catch (error) {
+            dispatch(setError(`Error adding comment: ${error}`))
+        }
+    }
+
     return (
         <div>
             <h2>{blog.title}</h2>
@@ -44,16 +67,21 @@ const Blog = ({ blog }) => {
             {loggedUser && loggedUser.username === blog.user.username && (
               <button onClick={handleRemove}>Remove</button>
             )}
-            {blog.comments.length !== 0 && (
-                <>
-                <h3>Comments</h3>
-                <ul>
-                    {blog.comments.map((comment) => (
-                        <li key={comment}>{comment}</li>
-                    ))}
-                </ul>
-                </>
-            )}
+            <h3>Comments</h3>
+            <form onSubmit={handleNewComment}>
+                <input
+                    type="text"
+                    value={comment}
+                    onChange={({ target }) => setComment(target.value)}
+                    placeholder="Add Comment"
+                />
+                <button type="submit">Add Comment</button>
+            </form>
+            <ul>
+                {blog.comments.map((comment) => (
+                    <li key={comment}>{comment}</li>
+                ))}
+            </ul>
         </div>
     )
 }

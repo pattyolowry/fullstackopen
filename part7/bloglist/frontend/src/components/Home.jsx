@@ -1,8 +1,6 @@
 import LoginForm from "../components/LoginForm";
 import BlogForm from "../components/BlogForm";
 import BlogList from "../components/BlogList";
-import Error from "../components/Error";
-import Notification from "../components/Notification";
 import { useSelector } from "react-redux";
 
 const Home = () => {
@@ -10,8 +8,6 @@ const Home = () => {
 
   return (
     <div>
-      <Notification />
-      <Error />
       <LoginForm />
       {user && (
         <div>

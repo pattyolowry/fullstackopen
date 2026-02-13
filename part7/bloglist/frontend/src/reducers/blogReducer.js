@@ -63,5 +63,12 @@ export const removeBlog = (blog) => {
   };
 };
 
+export const addComment = (blog, comment) => {
+  return async (dispatch) => {
+    const updatedBlog = { ...blog, comments: blog.comments.concat(comment) };
+    dispatch(updateBlog(updatedBlog));
+  };
+};
+
 export const { toggleVisibility } = blogSlice.actions;
 export default blogSlice.reducer;

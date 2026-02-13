@@ -4,7 +4,9 @@ import Users from "./components/Users";
 import User from "./components/User";
 import Blog from "./components/Blog";
 import Navigation from "./components/Navigation";
-import { Routes, Route, Navigate, useMatch, Link } from 'react-router-dom'
+import Error from "./components/Error";
+import Notification from "./components/Notification";
+import { Routes, Route, Navigate, useMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from "react-redux";
 import { initializeBlogs } from './reducers/blogReducer'
 
@@ -31,6 +33,8 @@ const App = () => {
   return (
     <div>
       <Navigation />
+      <Notification />
+      <Error />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/users" element={user ? <Users /> : <Navigate replace to="/" />} />
