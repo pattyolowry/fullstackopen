@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
 
-const BlogView = ({ blog }) => {
+const Blog = ({ blog }) => {
     const dispatch = useDispatch()
     const loggedUser = useSelector((state) => state.user);
 
@@ -44,8 +44,18 @@ const BlogView = ({ blog }) => {
             {loggedUser && loggedUser.username === blog.user.username && (
               <button onClick={handleRemove}>Remove</button>
             )}
+            {blog.comments.length !== 0 && (
+                <>
+                <h3>Comments</h3>
+                <ul>
+                    {blog.comments.map((comment) => (
+                        <li key={comment}>{comment}</li>
+                    ))}
+                </ul>
+                </>
+            )}
         </div>
     )
 }
 
-export default BlogView;
+export default Blog;
