@@ -41,10 +41,10 @@ const Navigation = () => {
           </Button>  
           {user && (
             <>
-            <em>{user.name} logged in</em>
             <Button color="inherit" onClick={handleLogout}>
                 Logout
             </Button>
+            <em>{user.name} logged in</em>
             </>
           )}             
         </Toolbar>

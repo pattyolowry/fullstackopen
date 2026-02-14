@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Alert } from '@mui/material'
 
 const Error = () => {
 
@@ -17,7 +18,11 @@ const Error = () => {
     return null;
   }
 
-  return <div style={errorStyle}>{error}</div>;
+  return (
+    <Alert severity="error">
+      {error}
+    </Alert>
+  )
 };
 
 export default Error;

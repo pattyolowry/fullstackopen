@@ -3,6 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from '../reducers/userReducer'
 import { setError } from '../reducers/errorReducer'
 import loginService from '../services/login'
+import {
+  TextField,
+  Button,
+  Stack
+} from '@mui/material'
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -33,27 +38,19 @@ const LoginForm = () => {
     <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
+        <Stack spacing={1} sx={{ maxWidth: 400, width: '100%' }}>
         <div>
-          <label>
-            username&nbsp;
-            <input
-              type="text"
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </label>
+          <TextField label="Username" onChange={({ target }) => setUsername(target.value)} />
         </div>
         <div>
-          <label>
-            password&nbsp;
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </label>
+          <TextField label="Password" type='password' onChange={({ target }) => setPassword(target.value)} />
         </div>
-        <button type="submit">login</button>
+        <div>
+          <Button variant="contained" color="primary" type="submit">
+            login
+          </Button>
+        </div>
+        </Stack>
       </form>
     </div>
   )
