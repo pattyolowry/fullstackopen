@@ -9,6 +9,7 @@ import Notification from "./components/Notification";
 import { Routes, Route, Navigate, useMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from "react-redux";
 import { initializeBlogs } from './reducers/blogReducer'
+import { Container } from '@mui/material'
 
 const App = () => {
   const dispatch = useDispatch();
@@ -31,6 +32,7 @@ const App = () => {
     : null
 
   return (
+    <Container>
     <div>
       <Navigation />
       <Notification />
@@ -42,6 +44,7 @@ const App = () => {
         <Route path="/blogs/:id" element={user ? <Blog blog={blog} /> : <Navigate replace to="/" />} />
       </Routes>
     </div>
+    </Container>
   );
 };
 

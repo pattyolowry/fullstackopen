@@ -5,6 +5,11 @@ import { setNotification } from "../reducers/notificationReducer";
 import { setError } from "../reducers/errorReducer";
 import blogService from "../services/blogs";
 import Togglable from "../components/Togglable";
+import {
+  TextField,
+  Button,
+  Stack
+} from '@mui/material'
 
 const BlogForm = () => {
   const [blogTitle, setBlogTitle] = useState("");
@@ -52,41 +57,16 @@ const BlogForm = () => {
     <Togglable buttonLabel="Create New Blog" ref={blogFormRef}>
     <div>
       <h2>Create New</h2>
+
       <form onSubmit={handleNewBlog}>
-        <div>
-          <label>
-            title: &nbsp;
-            <input
-              type="text"
-              value={blogTitle}
-              onChange={({ target }) => setBlogTitle(target.value)}
-              placeholder="Title"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            author:&nbsp;
-            <input
-              type="text"
-              value={blogAuthor}
-              onChange={({ target }) => setBlogAuthor(target.value)}
-              placeholder="Author"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            url:&nbsp;
-            <input
-              type="text"
-              value={blogUrl}
-              onChange={({ target }) => setBlogUrl(target.value)}
-              placeholder="Url"
-            />
-          </label>
-        </div>
-        <button type="submit">create</button>
+        <Stack spacing={1} sx={{ maxWidth: 400, width: '100%' }}>
+          <TextField label="Title" size="small" onChange={({ target }) => setBlogTitle(target.value)} />
+          <TextField label="Author" size="small" onChange={({ target }) => setBlogAuthor(target.value)} />
+          <TextField label="Url" size="small" onChange={({ target }) => setBlogUrl(target.value)} />
+          <Button variant="contained" size="small" color="primary" type="submit">
+            Create
+          </Button>
+        </Stack>
       </form>
     </div>
     </Togglable>
