@@ -28,6 +28,25 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
+      if (args.published < 0 || args.published > 2026) {
+        throw new GraphQLError(`Invalid published date: ${args.published}`, {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.published,
+          },
+        });
+      }
+
+      const bookExists = await Book.exists({ title: args.title });
+      if (bookExists) {
+        throw new GraphQLError(`Book title must be unique: ${args.title}`, {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.title,
+          },
+        });
+      }
+
       let author = await Author.findOne({ name: args.author });
       if (!author) {
         console.log("adding new author...");
@@ -39,6 +58,15 @@ const resolvers = {
       return book.populate("author");
     },
     editAuthor: async (root, args) => {
+      if (args.setBornTo < 0 || args.setBornTo > 2026) {
+        throw new GraphQLError(`Invalid birth year: ${args.setBornTo}`, {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.setBornTo,
+          },
+        });
+      }
+
       const author = await Author.findOne({ name: args.name });
       if (!author) {
         console.log("author not found");
