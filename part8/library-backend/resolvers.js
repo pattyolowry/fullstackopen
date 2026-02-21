@@ -3,122 +3,27 @@ const { v1: uuid } = require("uuid");
 const Book = require("./models/book");
 const Author = require("./models/author");
 
-let authors = [
-  {
-    name: "Robert Martin",
-    id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
-    born: 1952,
-  },
-  {
-    name: "Martin Fowler",
-    id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
-    born: 1963,
-  },
-  {
-    name: "Fyodor Dostoevsky",
-    id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
-    born: 1821,
-  },
-  {
-    name: "Joshua Kerievsky", // birthyear not known
-    id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    name: "Sandi Metz", // birthyear not known
-    id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
-  },
-];
-
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
- */
-
-let books = [
-  {
-    title: "Clean Code",
-    published: 2008,
-    author: "69991a76a16d644dfa42a529",
-    id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
-    genres: ["refactoring"],
-  },
-  {
-    title: "Agile software development",
-    published: 2002,
-    author: "69991a76a16d644dfa42a529",
-    id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
-    genres: ["agile", "patterns", "design"],
-  },
-  {
-    title: "Refactoring, edition 2",
-    published: 2018,
-    author: "69991a76a16d644dfa42a52a",
-    id: "afa5de00-344d-11e9-a414-719c6709cf3e",
-    genres: ["refactoring"],
-  },
-  {
-    title: "Refactoring to patterns",
-    published: 2008,
-    author: "69991a76a16d644dfa42a52c",
-    id: "afa5de01-344d-11e9-a414-719c6709cf3e",
-    genres: ["refactoring", "patterns"],
-  },
-  {
-    title: "Practical Object-Oriented Design, An Agile Primer Using Ruby",
-    published: 2012,
-    author: "69991a76a16d644dfa42a52d",
-    id: "afa5de02-344d-11e9-a414-719c6709cf3e",
-    genres: ["refactoring", "design"],
-  },
-  {
-    title: "Crime and punishment",
-    published: 1866,
-    author: "69991a76a16d644dfa42a52b",
-    id: "afa5de03-344d-11e9-a414-719c6709cf3e",
-    genres: ["classic", "crime"],
-  },
-  {
-    title: "Demons",
-    published: 1872,
-    author: "69991a76a16d644dfa42a52b",
-    id: "afa5de04-344d-11e9-a414-719c6709cf3e",
-    genres: ["classic", "revolution"],
-  },
-];
-
 const resolvers = {
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
-    allBooks: async () => {
-      // filters missing
-      //   if (!args.author && !args.genre) {
-      //     return books;
-      //   }
-      //   let results = books;
-      //   if (args.author) {
-      //     results = results.filter((r) => r.author === args.author);
-      //   }
-      //   if (args.genre) {
-      //     results = results.filter((r) => r.genres.includes(args.genre));
-      //   }
-      return Book.find({}).populate("author");
+    allBooks: async (root, args) => {
+      let books = await Book.find({}).populate("author");
+
+      if (args.author) {
+        books = books.filter((b) => b.author.name === args.author);
+      }
+      if (args.genre) {
+        books = books.filter((b) => b.genres.includes(args.genre));
+      }
+
+      return books;
     },
     allAuthors: async () => Author.find({}),
   },
   Author: {
-    bookCount: (root) => {
-      const aBooks = books.filter((b) => b.author === root.name);
-      return aBooks.length;
+    bookCount: async (root) => {
+      return Book.find({ author: root.id }).countDocuments();
     },
   },
   Mutation: {
@@ -133,14 +38,14 @@ const resolvers = {
       book = await book.save();
       return book.populate("author");
     },
-    editAuthor: (root, args) => {
-      const author = authors.find((a) => a.name === args.name);
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name });
       if (!author) {
+        console.log("author not found");
         return null;
       }
-      const updatedAuthor = { ...author, born: args.setBornTo };
-      authors = authors.map((a) => (a.name === args.name ? updatedAuthor : a));
-      return updatedAuthor;
+      author.born = args.setBornTo;
+      return author.save();
     },
   },
 };
