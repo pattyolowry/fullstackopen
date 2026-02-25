@@ -1,9 +1,9 @@
 import { useQuery } from '@apollo/client/react'
 import { ALL_BOOKS } from '../queries'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const Books = (props) => {
-  const [genre, setGenre] = useState('all')
+  const [genre, setGenre] = useState(props.user ? props.user.favoriteGenre : "all")
   const result = useQuery(ALL_BOOKS)
 
   if (!props.show) {
@@ -31,8 +31,12 @@ const Books = (props) => {
 
   return (
     <div>
-      <h2>books</h2>
-      <p>in genre <b>{genre}</b></p>
+      {!props.user && (
+        <>
+        <h2>books</h2>
+        <p>in genre <b>{genre}</b></p>
+        </>
+      )}
       <table>
         <tbody>
           <tr>
@@ -49,12 +53,14 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
-      <div>
-        {allGenres.map((g) => (
-          <button key={g} onClick={() => setGenre(g)}>{g}</button>
-        ))}
-        <button onClick={() => setGenre('all')}>all genres</button>
-      </div>
+      {!props.user && (
+        <div>
+          {allGenres.map((g) => (
+            <button key={g} onClick={() => setGenre(g)}>{g}</button>
+          ))}
+          <button onClick={() => setGenre('all')}>all genres</button>
+        </div>
+      )}
     </div>
   )
 }
