@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const Books = (props) => {
   const [genre, setGenre] = useState(props.user ? props.user.favoriteGenre : "all")
-  const books = useQuery(ALL_BOOKS, {variables: { genre: genre === "all" ? null : genre }})
+  const books = useQuery(ALL_BOOKS, {variables: genre === "all" ? null : { genre: genre }})
 
   if (!props.show) {
     return null
