@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm'
 import Recommendation from './components/Recommendation'
 import { useApolloClient, useQuery, useSubscription } from '@apollo/client/react'
 import { ALL_BOOKS, BOOK_ADDED } from './queries'
+import { addBookToCache } from './utils/apolloCache'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -18,6 +19,7 @@ const App = () => {
     onData: ({ data }) => {
       const addedBook = data.data.bookAdded
       notify(`${addedBook.title} added`)
+      addBookToCache(client.cache, addedBook)
     },
   })
 
