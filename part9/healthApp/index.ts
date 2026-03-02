@@ -1,5 +1,5 @@
 import express from 'express';
-import { calculateBmi, BmiValues } from "./bmiCalculator"
+import { calculateBmi, BmiValues } from "./bmiCalculator";
 import { ParsedQs } from 'qs';
 
 const app = express();
@@ -11,11 +11,11 @@ const parseBmiParams = (params: ParsedQs): BmiValues => {
     return {
       height: Number(params.height),
       weight: Number(params.weight)
-    }
+    };
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
 app.get('/hello', (_req, res) => {
   res.send('Hello Full Stack!');
@@ -23,7 +23,7 @@ app.get('/hello', (_req, res) => {
 
 app.get('/bmi', (req, res) => {
   try {
-  const { height, weight } = parseBmiParams(req.query)
+  const { height, weight } = parseBmiParams(req.query);
   const bmi = calculateBmi(height, weight);
   res.send({
     weight,
@@ -35,7 +35,7 @@ app.get('/bmi', (req, res) => {
         {
             error: "malformatted parameters"
         }
-    )
+    );
   }
 });
 
