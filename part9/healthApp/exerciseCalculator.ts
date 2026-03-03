@@ -34,7 +34,7 @@ const parseExerciseArgs = (args: string[]): ExerciseInputs => {
   };
 };
 
-const calculateExercises = (dailyExercise: number[], target: number): ExerciseData => {
+export const calculateExercises = (dailyExercise: number[], target: number): ExerciseData => {
     let hoursTrained = 0;
     let daysTrained = 0;
     const periodLength = dailyExercise.length;
