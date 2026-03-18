@@ -62,4 +62,4 @@ typings/
 
 # local data
 data/*
-redis_data/*
+.redis_data/*
