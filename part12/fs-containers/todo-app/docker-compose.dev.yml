@@ -1,14 +1,42 @@
 services:
   app:
     image: todo-frontend-dev
+    environment:
+      VITE_BACKEND_URL: http://localhost:8080/api
     build:
-      context: ./todo-frontend # The context will pick this directory as the "build context"
-      dockerfile: ./todo-frontend/dev.Dockerfile # This will simply tell which dockerfile to read
+      context: ./todo-frontend
+      dockerfile: dev.Dockerfile
     volumes:
-      - ./todo-frontend:/usr/src/app # The path can be relative, so ./ is enough to say "the same location as the docker-compose.yml"
-    ports:
-      - 5173:5173
-    container_name: todo-frontend-dev # This will name the container todo-frontend-dev
+      - ./todo-frontend:/usr/src/app
+    container_name: todo-frontend-dev
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: the_database
+    volumes:
+      - ./todo-backend/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ./mongo_data:/data/db
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./redis_data:/data
+
+  server:
+    image: todo-backend-dev
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URL=mongodb://the_username:the_password@mongo:27017/the_database
+    build:
+      context: ./todo-backend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./todo-backend:/usr/src/app
+    container_name: todo-backend-dev
 
   nginx:
     image: nginx:1.29
@@ -18,4 +46,12 @@ services:
       - 8080:80
     container_name: reverse-proxy
     depends_on:
-      - app # wait for the frontend container to be started
+      - app
+      - server
+
+  debug-helper:
+    image: busybox
+
+volumes:
+  mongo_data:
+  redis_data:
