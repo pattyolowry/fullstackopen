@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
     attributes: { exclude: ["userId"] },
     include: {
       model: User,
-      attributes: ["name"],
+      attributes: ["id", "name"],
     },
   });
   res.json(notes);
