@@ -28,9 +28,13 @@ router.put("/:id", blogFinder, async (req, res, next) => {
   }
 });
 
-router.delete("/:id", blogFinder, async (req, res) => {
-  await req.blog.destroy();
-  res.status(204).end();
+router.delete("/:id", blogFinder, tokenExtractor, async (req, res) => {
+  if (req.blog.blogUserId === req.user.id) {
+    await req.blog.destroy();
+    res.status(204).end();
+  } else {
+    res.status(403).json({ error: "User not authorized to delete blog" });
+  }
 });
 
 module.exports = router;
