@@ -11,9 +11,13 @@ const blogFinder = async (req, res, next) => {
 const errorHandler = (error, _req, response, next) => {
   if (error.name === "SequelizeValidationError") {
     return response.status(400).json({
-      error: {
-        errors: error.errors.map((e) => e.message),
-      },
+      error: error.errors.map((e) => {
+        if (e.message === "Validation isEmail on username failed") {
+          return "username must be a valid email address";
+        } else {
+          return e.message;
+        }
+      }),
     });
   } else if (error.name === "SequelizeDatabaseError") {
     return response.status(400).json({ error: "Invalid request parameters" });

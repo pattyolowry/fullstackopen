@@ -15,6 +15,9 @@ BlogUser.init(
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
+      validate: {
+        isEmail: true,
+      },
     },
     name: {
       type: DataTypes.STRING,
