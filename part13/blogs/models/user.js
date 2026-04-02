@@ -23,6 +23,10 @@ BlogUser.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    passwordHash: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize,

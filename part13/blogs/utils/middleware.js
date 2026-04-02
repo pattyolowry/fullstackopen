@@ -22,7 +22,7 @@ const errorHandler = (error, _req, response, next) => {
       }),
     });
   } else if (error.name === "SequelizeDatabaseError") {
-    return response.status(400).json({ error: "Invalid request parameters" });
+    return response.status(400).json({ error });
   } else if (error.type === "entity.parse.failed") {
     return response.status(400).json({ error: "Unable to parse request body" });
   } else if (error.message) {
