@@ -14,6 +14,33 @@ router.get("/", async (req, res) => {
   res.json(users);
 });
 
+router.get("/:id", async (req, res) => {
+  const user = await BlogUser.findByPk(req.params.id, {
+    include: [
+      {
+        model: Blog,
+        attributes: {
+          exclude: ["blogUserId"],
+        },
+      },
+      {
+        model: Blog,
+        as: "readings",
+        attributes: { exclude: ["blogUserId"] },
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404).end();
+  }
+});
+
 router.post("/", async (req, res, next) => {
   try {
     const saltRounds = 10;

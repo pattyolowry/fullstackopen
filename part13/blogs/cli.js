@@ -9,6 +9,7 @@ const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
 const authorRouter = require("./controllers/authors");
 const resetRouter = require("./controllers/reset");
+const readingListRouter = require("./controllers/readingLists");
 const defaultRouter = require("./controllers/default");
 const { errorHandler } = require("./utils/middleware");
 
@@ -29,6 +30,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/authors", authorRouter);
 app.use("/api/reset", resetRouter);
+app.use("/api/readinglists", readingListRouter);
 app.use("/", defaultRouter);
 app.use(errorHandler);
 
