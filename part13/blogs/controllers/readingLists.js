@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { ReadingList, BlogUser } = require("../models");
+const { ReadingList } = require("../models");
 const { tokenExtractor } = require("../utils/middleware");
 
 router.post("/", async (req, res, next) => {

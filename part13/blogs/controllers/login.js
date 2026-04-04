@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { SECRET } = require("../utils/config");
-const BlogUser = require("../models/user");
+const { BlogUser, Session } = require("../models");
 
 router.post("/", async (request, response) => {
   const body = request.body;
@@ -24,12 +24,27 @@ router.post("/", async (request, response) => {
     });
   }
 
-  const userForToken = {
-    username: user.username,
-    id: user.id,
-  };
+  const session = await Session.findOne({
+    where: {
+      blogUserId: user.id,
+    },
+  });
 
-  const token = jwt.sign(userForToken, SECRET);
+  let token = null;
+  if (session) {
+    token = session.token;
+  } else {
+    const userForToken = {
+      username: user.username,
+      id: user.id,
+    };
+
+    token = jwt.sign(userForToken, SECRET);
+    await Session.create({
+      blogUserId: user.id,
+      token,
+    });
+  }
 
   response
     .status(200)

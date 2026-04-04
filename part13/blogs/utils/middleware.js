@@ -1,4 +1,4 @@
-const { Blog } = require("../models");
+const { Blog, Session } = require("../models");
 const jwt = require("jsonwebtoken");
 const { SECRET } = require("../utils/config");
 
@@ -32,11 +32,24 @@ const errorHandler = (error, _req, response, next) => {
   next(error);
 };
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = async (req, res, next) => {
   const authorization = req.get("authorization");
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
     try {
-      req.user = jwt.verify(authorization.substring(7), SECRET);
+      const token = authorization.substring(7);
+      const user = jwt.verify(token, SECRET);
+      const session = await Session.findOne({
+        where: {
+          blogUserId: user.id,
+          token,
+        },
+      });
+
+      if (!session) {
+        return res.status(401).json({ error: "token expired" });
+      }
+
+      req.user = user;
     } catch {
       return res.status(401).json({ error: "token invalid" });
     }
