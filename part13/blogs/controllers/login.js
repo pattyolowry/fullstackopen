@@ -24,27 +24,16 @@ router.post("/", async (request, response) => {
     });
   }
 
-  const session = await Session.findOne({
-    where: {
-      blogUserId: user.id,
-    },
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+
+  const token = jwt.sign(userForToken, SECRET);
+  await Session.create({
+    blogUserId: user.id,
+    token,
   });
-
-  let token = null;
-  if (session) {
-    token = session.token;
-  } else {
-    const userForToken = {
-      username: user.username,
-      id: user.id,
-    };
-
-    token = jwt.sign(userForToken, SECRET);
-    await Session.create({
-      blogUserId: user.id,
-      token,
-    });
-  }
 
   response
     .status(200)

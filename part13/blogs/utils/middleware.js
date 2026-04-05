@@ -41,7 +41,6 @@ const tokenExtractor = async (req, res, next) => {
       const session = await Session.findOne({
         where: {
           blogUserId: user.id,
-          token,
         },
       });
 

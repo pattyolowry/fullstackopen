@@ -4,6 +4,7 @@ const { BlogUser, Blog, ReadingList } = require("../models");
 
 router.get("/", async (req, res) => {
   const users = await BlogUser.findAll({
+    attributes: { exclude: ["passwordHash"] },
     include: {
       model: Blog,
       attributes: {
@@ -21,6 +22,7 @@ router.get("/:id", async (req, res) => {
   }
 
   const user = await BlogUser.findByPk(req.params.id, {
+    attributes: { exclude: ["passwordHash"] },
     include: [
       {
         model: Blog,
@@ -45,7 +47,14 @@ router.get("/:id", async (req, res) => {
   });
 
   if (user) {
-    res.json(user);
+    // Adjust shape to meet test requirement
+    const userJson = user.toJSON();
+    userJson.readings.map((blog) => {
+      blog.reading_list = blog.reading_lists[0] || {};
+      delete blog.reading_lists;
+    });
+
+    res.json(userJson);
   } else {
     res.status(404).end();
   }
